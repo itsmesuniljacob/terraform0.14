@@ -1,28 +1,28 @@
-# locals {
-#   # Hack to work around https://github.com/hashicorp/terraform/issues/15605 and https://github.com/hashicorp/terraform/issues/16380
-#   gke_encryption_key = var.gke_encryption_state == "DECRYPTED" ? "" : google_kms_crypto_key.crypto_key.self_link
-# }
+locals {
+  # Hack to work around https://github.com/hashicorp/terraform/issues/15605 and https://github.com/hashicorp/terraform/issues/16380
+  gke_encryption_key = var.gke_encryption_state == "DECRYPTED" ? "" : google_kms_crypto_key.crypto_key.self_link
+}
 
-# provider "kubernetes" {
-#   alias                  = "gke"
+provider "kubernetes" {
+  alias                  = "gke"
 #   version                = "1.7"
-#   load_config_file       = false
-#   host                   = "${module.gke.gke_cluster_endpoint}"
-#   token                  = "${module.gke.google_client_config_access_token}"
-#   cluster_ca_certificate = "${base64decode(module.gke.gke_cluster_cluster_ca_certificate)}"
-# }
+  load_config_file       = false
+  host                   = module.gke.gke_cluster_endpoint
+  token                  = module.gke.google_client_config_access_token
+  cluster_ca_certificate = base64decode(module.gke.gke_cluster_cluster_ca_certificate)
+}
 
-# provider "helm" {
-#   alias          = "gke"
-#   install_tiller = false
+provider "helm" {
+  alias          = "gke"
+  install_tiller = false
 #   version        = "1.3.1"
-#   kubernetes {
-#     host                   = "${module.gke.gke_cluster_endpoint}"
-#     token                  = "${module.gke.google_client_config_access_token}"
-#     cluster_ca_certificate = "${base64decode(module.gke.gke_cluster_cluster_ca_certificate)}"
-#     load_config_file       = false
-#   }
-# }
+  kubernetes {
+    host                   = module.gke.gke_cluster_endpoint
+    token                  = module.gke.google_client_config_access_token
+    cluster_ca_certificate = base64decode(module.gke.gke_cluster_cluster_ca_certificate)
+    load_config_file       = false
+  }
+}
 
 # module "gke" {
 #   source             = "git::ssh://git@gitlab.com/falabella-gitlab/catalyst/devops/global-terraform0.12-modules.git//gke"

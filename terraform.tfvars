@@ -1,0 +1,1 @@
+gke_encryption_state    =   "ENCRYPTED"

@@ -21,13 +21,13 @@
 variable "project_name" {
   type        = string
   description = "GCP project Name"
-  default     = "core-commerce-dev"
+  default     = "terraform14"
 }
 
 variable "project_id" {
   type        = string
   description = "GCP project ID"
-  default     = "core-commerce-dev"
+  default     = "terraform0"
 }
 
 # variable "gke_encryption_state" {
@@ -48,7 +48,12 @@ variable "region" {
 #   default     = "gke-istio-16"
 # }
 
-variable "google_credentials" {
+# variable "google_credentials" {
+#   type        = string
+#   description = "GCP SA account"
+# }
+
+variable "gke_encryption_state" {
   type        = string
-  description = "GCP SA account"
+  description = "the state of encryption key"
 }
