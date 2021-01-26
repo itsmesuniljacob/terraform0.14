@@ -1,0 +1,58 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  addonComponents:
+    istiocoredns:
+      enabled: true
+
+  values:
+    global:
+      # Provides dns resolution for global services
+      podDNSSearchNamespaces:
+        - global
+
+      multiCluster:
+        enabled: true
+
+      controlPlaneSecurityEnabled: true
+
+    meshConfig:
+      accessLogFile: "/dev/stdout"
+      accessLogEncoding: "JSON"
+      enableAutoMtls: true
+
+    gateways:
+      # istio-egressgateway:
+      #   env:
+      #     # Needed to route traffic via egress gateway if desired.
+      #     ISTIO_META_REQUESTED_NETWORK_VIEW: "external"
+      istio-ingressgateway:
+        autoscaleMin: 3
+        autoscaleMax: 10
+        autoscaleEnabled: true
+        type: LoadBalancer
+  #      loadBalancerIP: 1.2.3.4
+
+    # Provides dns resolution for service entries of form
+    # name.namespace.global
+    istiocoredns:
+      enabled: true
+      replicaCount: 2
+
+    # Ensures liveliness and readiness to work after enabling MTLS
+    sidecarInjectorWebhook:
+      rewriteAppHTTPProbe: true
+
+    mixer:
+      policy:
+        enabled: true
+        autoscaleMin: 3
+        autoscaleMax: 10
+      telemetry:
+        enabled: true
+        autoscaleMin: 3
+        autoscaleMax: 10
+
+    pilot:
+      autoscaleMin: 3
+      autoscaleMax: 10
