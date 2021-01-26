@@ -57,3 +57,24 @@ variable "gke_encryption_state" {
   type        = string
   description = "the state of encryption key"
 }
+
+variable "gke_encryption_key" {
+  type        = string
+  description = "GKE encryption key"
+  
+}
+variable "zone" {
+  description = "Google Cloud zone"
+  type        = string
+  default     = "us-east4-a"
+}
+
+variable "machine_type" {
+  description = "Google VM Instance type."
+  type        = string
+}
+variable "istio_version" {
+  type  = string
+  description = "istio version"
+  default     = "1.6.7"
+}
