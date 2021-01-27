@@ -22,7 +22,9 @@ override.tf.json
 *_override.tf.json
 terraform0.json
 .terraform.lock.hcl
-istio-1.*
+istio-1.*/bin/*
+istio-1.*/samples/*
+istio-1.*/tools/*
 # Include override files you do wish to add to version control using negated pattern
 #
 # !example_override.tf

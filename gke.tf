@@ -7,21 +7,22 @@ resource "google_project_iam_member" "container_service_account" {
     role = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
     member = "serviceAccount:service-${data.google_project.project.number}@container-engine-robot.iam.gserviceaccount.com"
 }
+
+data "google_client_config" "default" {}
 provider "kubernetes" {
   alias                  = "gke"
   load_config_file       = false
-  host                   = module.gke.gke_cluster_endpoint
-  token                  = module.gke.google_client_config_access_token
-  cluster_ca_certificate = base64decode(module.gke.gke_cluster_cluster_ca_certificate)
+  host                   = google_container_cluster.my_k8s_cluster.endpoint
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.my_k8s_cluster.master_auth[0].cluster_ca_certificate)
 }
 
 provider "helm" {
   alias          = "gke"
-  install_tiller = false
   kubernetes {
-    host                   = module.gke.gke_cluster_endpoint
-    token                  = module.gke.google_client_config_access_token
-    cluster_ca_certificate = base64decode(module.gke.gke_cluster_cluster_ca_certificate)
+    host                   = google_container_cluster.my_k8s_cluster.endpoint
+    token                  = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(google_container_cluster.my_k8s_cluster.master_auth[0].cluster_ca_certificate)
     load_config_file       = false
   }
 }
@@ -69,10 +70,27 @@ resource "null_resource" "download_istio" {
     command = "rm -rf ${self.triggers.on_version_change}"
   }
 }
-# resource "helm_release" "istio-operator" {
-#   name       = istio-operator
-#   chart      = "manifests/charts/istio-operator" 
-#   namespace  = "istio-system"
-#   values     =  [var.chart-values] 
-#   skip_crds = true
-# }
+
+resource "kubernetes_namespace" "gke_namespace" {
+    provider    = kubernetes.gke
+    for_each = var.gke_namespaces
+
+    metadata    {
+        annotations = {
+            name    = each.key
+        }
+        labels = {
+            istio-injection = "enabled"
+        }
+
+        name = each.key
+    }
+
+    depends_on = [ google_container_cluster.my_k8s_cluster ]
+}
+
+resource "helm_release" "istio-operator" {
+  provider   = helm.gke
+  name       = "istio-operator"
+  chart      = "${path.module}/istio-1.6.7/manifests/charts/istio-operator"
+}

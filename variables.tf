@@ -78,3 +78,8 @@ variable "istio_version" {
   description = "istio version"
   default     = "1.6.7"
 }
+
+variable "gke_namespaces" {
+  type        = set(string)
+  description = "namespaces"
+}
