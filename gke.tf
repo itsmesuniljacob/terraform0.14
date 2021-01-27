@@ -92,5 +92,5 @@ resource "kubernetes_namespace" "gke_namespace" {
 resource "helm_release" "istio-operator" {
   provider   = helm.gke
   name       = "istio-operator"
-  chart      = "${path.module}/istio-1.6.7/manifests/charts/istio-operator"
+  chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/istio-operator"
 }
