@@ -94,3 +94,26 @@ resource "helm_release" "istio-operator" {
   name       = "istio-operator"
   chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/istio-operator"
 }
+
+resource "kubernetes_namespace" "istio_system" {
+  provider    = kubernetes.gke
+  metadata {
+    labels = {
+        istio-injection = "disabled"
+        istio-operator-managed = "Reconcile"
+    }  
+    name        = "istio-system"
+  }
+}
+
+resource "helm_release" "istio-base" {
+  provider   = helm.gke
+  name       = "istio-base"
+  chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/base"
+}
+
+# resource "helm_release" "istio-discovery" {
+#   provider   = helm.gke
+#   name       = "istio-discovery"
+#   chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/istio-control/istio-discovery"
+# }
