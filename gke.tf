@@ -30,7 +30,7 @@ provider "helm" {
 resource "google_container_cluster" "my_k8s_cluster" {
     provider           = google-beta
     name               = "terraform-istio"
-    location           = "us-east4"
+    location           = "us-east4-c"
     initial_node_count = 1
     project            = var.project_id
 
@@ -57,60 +57,60 @@ resource "google_container_cluster" "my_k8s_cluster" {
     }
 }
 
-resource "null_resource" "download_istio" {
-  triggers = {
-    on_version_change = var.istio_version
-  }
-  provisioner "local-exec" {
-    command = "curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${var.istio_version} TARGET_ARCH=x86_64 sh -"
-  }
+# resource "null_resource" "download_istio" {
+#   triggers = {
+#     on_version_change = var.istio_version
+#   }
+#   provisioner "local-exec" {
+#     command = "curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${var.istio_version} TARGET_ARCH=x86_64 sh -"
+#   }
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "rm -rf ${self.triggers.on_version_change}"
-  }
-}
+#   provisioner "local-exec" {
+#     when    = destroy
+#     command = "rm -rf ${self.triggers.on_version_change}"
+#   }
+# }
 
-resource "kubernetes_namespace" "gke_namespace" {
-    provider    = kubernetes.gke
-    for_each = var.gke_namespaces
+# resource "kubernetes_namespace" "gke_namespace" {
+#     provider    = kubernetes.gke
+#     for_each = var.gke_namespaces
 
-    metadata    {
-        annotations = {
-            name    = each.key
-        }
-        labels = {
-            istio-injection = "enabled"
-        }
+#     metadata    {
+#         annotations = {
+#             name    = each.key
+#         }
+#         labels = {
+#             istio-injection = "enabled"
+#         }
 
-        name = each.key
-    }
+#         name = each.key
+#     }
 
-    depends_on = [ google_container_cluster.my_k8s_cluster ]
-}
+#     depends_on = [ google_container_cluster.my_k8s_cluster ]
+# }
 
-resource "helm_release" "istio-operator" {
-  provider   = helm.gke
-  name       = "istio-operator"
-  chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/istio-operator"
-}
+# resource "helm_release" "istio-operator" {
+#   provider   = helm.gke
+#   name       = "istio-operator"
+#   chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/istio-operator"
+# }
 
-resource "kubernetes_namespace" "istio_system" {
-  provider    = kubernetes.gke
-  metadata {
-    labels = {
-        istio-injection = "disabled"
-        istio-operator-managed = "Reconcile"
-    }  
-    name        = "istio-system"
-  }
-}
+# resource "kubernetes_namespace" "istio_system" {
+#   provider    = kubernetes.gke
+#   metadata {
+#     labels = {
+#         istio-injection = "disabled"
+#         istio-operator-managed = "Reconcile"
+#     }  
+#     name        = "istio-system"
+#   }
+# }
 
-resource "helm_release" "istio-base" {
-  provider   = helm.gke
-  name       = "istio-base"
-  chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/base"
-}
+# resource "helm_release" "istio-base" {
+#   provider   = helm.gke
+#   name       = "istio-base"
+#   chart      = "${path.module}/istio-${var.istio_version}/manifests/charts/base"
+# }
 
 # resource "helm_release" "istio-discovery" {
 #   provider   = helm.gke

@@ -13,9 +13,4 @@ terraform {
       version = "2.15.0"
     }
   }
-} 
-
-provider "google-beta" {
-  project = var.project_id
 }
-
