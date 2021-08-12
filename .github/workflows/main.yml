@@ -27,5 +27,5 @@ jobs:
       - name: Super-Linter
         uses: github/super-linter@v4.6.1
         env:
-         FILTER_REGEX_INCLUDE: "*.tf"
+         FILTER_REGEX_INCLUDE: "./*.tf"
       
