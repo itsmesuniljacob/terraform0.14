@@ -28,6 +28,7 @@ provider "helm" {
 }
 
 resource "google_container_cluster" "my_k8s_cluster" {
+  #ts:skip=accurics.gcp.NS.109 need to skip this rule
     provider           = google-beta
     name               = "terraform-istio"
     location           = "us-east4-c"
