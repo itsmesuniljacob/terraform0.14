@@ -28,4 +28,5 @@ jobs:
         uses: github/super-linter@v4.6.1
         env:
          FILTER_REGEX_INCLUDE: "./*.tf"
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
